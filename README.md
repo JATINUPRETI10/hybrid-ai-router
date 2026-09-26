@@ -163,16 +163,16 @@ Gemini is selected for general-purpose tasks such as:
 ```
 # Technology Stack
 ## Frontend
--React
--JavaScript
--Vite
--CSS
+- React
+- JavaScript
+- Vite
+- CSS
 ## Backend
--Python
--FastAPI
--Pydantic
--Uvicorn
+- Python
+- FastAPI
+- Pydantic
+- Uvicorn
 ## AI
-Gemini
--JEV
--LLM-based routing
+- Gemini
+- JEV
+- LLM-based routing
