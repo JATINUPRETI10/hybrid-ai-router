@@ -11,13 +11,12 @@ from app.executor import (
     compare_backends
 )
 
-
 app = FastAPI(
     title="Hybrid AI Router",
-    description="Intelligent routing between JEV and Gemini",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/docs",
+    openapi_url="/openapi.json"
 )
-
 
 # --------------------------------------------------
 # CORS
