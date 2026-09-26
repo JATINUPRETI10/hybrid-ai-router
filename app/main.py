@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
 from app.llm import ask_llm
 from app.jev import ask_jev
 from app.router import route_query
@@ -10,6 +9,8 @@ from app.executor import (
     execute_jev,
     compare_backends
 )
+
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
