@@ -2,7 +2,9 @@ import { useState } from "react";
 import "./App.css";
 import ReactMarkdown from "react-markdown";
 
+
 function App() {
+
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -10,11 +12,13 @@ function App() {
   const [error, setError] = useState("");
   const [darkMode, setDarkMode] = useState(false);
 
+
   // =====================================================
   // ANALYZE QUERY
   // =====================================================
 
   const analyzeQuery = async () => {
+
     if (!query.trim()) return;
 
     setLoading(true);
@@ -23,20 +27,25 @@ function App() {
     setShowEvaluation(false);
 
     try {
+
       const response = await fetch(
         "https://hybrid-ai-router-gv4w.onrender.com/compare",
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
           },
+
           body: JSON.stringify({
             query: query,
           }),
         }
       );
 
+
       if (!response.ok) {
+
         const errorText = await response.text();
 
         throw new Error(
@@ -44,92 +53,135 @@ function App() {
         );
       }
 
+
       const data = await response.json();
 
       console.log("COMPARE RESPONSE:", data);
 
       setResult(data);
+
     } catch (err) {
+
       console.error("Frontend error:", err);
 
       setError(
-        "Unable to connect to the backend. Make sure your FastAPI server is running."
+        err.message ||
+        "Unable to connect to the backend."
       );
+
     } finally {
+
       setLoading(false);
+
     }
   };
+
 
   // =====================================================
   // PROVIDER
   // =====================================================
 
   const getProvider = () => {
+
     if (!result) return "—";
 
-    if (result.selected_provider) {
-      return String(result.selected_provider).toUpperCase();
+
+    if (result.routing?.selected_provider) {
+      return String(
+        result.routing.selected_provider
+      ).toUpperCase();
     }
+
+
+    if (result.selected_provider) {
+      return String(
+        result.selected_provider
+      ).toUpperCase();
+    }
+
 
     if (result.route) {
-      return String(result.route).toUpperCase();
+      return String(
+        result.route
+      ).toUpperCase();
     }
 
+
     if (result.provider) {
-      return String(result.provider).toUpperCase();
+      return String(
+        result.provider
+      ).toUpperCase();
     }
+
 
     if (result.jev) {
       return "JEV";
     }
 
+
     if (result.gemini) {
       return "GEMINI";
     }
 
+
     return "—";
   };
+
 
   // =====================================================
   // ANSWER
   // =====================================================
 
   const getAnswer = () => {
+
     if (!result) return "—";
 
     const provider = getProvider();
+
 
     // -------------------------
     // GEMINI
     // -------------------------
 
     if (provider === "GEMINI") {
+
       if (typeof result.answer === "string") {
         return result.answer;
       }
+
 
       if (result.answer?.text) {
         return result.answer.text;
       }
 
+
       if (result.gemini?.answer) {
-        if (typeof result.gemini.answer === "string") {
+
+        if (
+          typeof result.gemini.answer === "string"
+        ) {
           return result.gemini.answer;
         }
+
 
         if (result.gemini.answer?.text) {
           return result.gemini.answer.text;
         }
+
       }
+
 
       if (result.gemini?.text) {
         return result.gemini.text;
       }
 
+
       if (result.gemini?.response) {
         return result.gemini.response;
       }
+
     }
+
 
     // -------------------------
     // JEV
@@ -139,29 +191,38 @@ function App() {
       return result.jev.answer.decision;
     }
 
+
     if (result.decision) {
       return result.decision;
     }
+
 
     if (result.answer?.decision) {
       return result.answer.decision;
     }
 
+
     if (typeof result.answer === "string") {
       return result.answer;
     }
 
+
     return "No answer returned.";
   };
+
 
   // =====================================================
   // CONFIDENCE
   // =====================================================
 
   const getConfidence = () => {
+
     if (!result) return null;
 
-    let confidence = result.jev?.answer?.confidence;
+
+    let confidence =
+      result.jev?.answer?.confidence;
+
 
     if (
       confidence === undefined ||
@@ -170,6 +231,7 @@ function App() {
       confidence = result.confidence;
     }
 
+
     if (
       confidence === undefined ||
       confidence === null
@@ -177,24 +239,32 @@ function App() {
       return null;
     }
 
+
     confidence = Number(confidence);
+
 
     if (Number.isNaN(confidence)) {
       return null;
     }
 
+
     if (confidence <= 1) {
-      return Math.round(confidence * 100);
+      return Math.round(
+        confidence * 100
+      );
     }
+
 
     return Math.round(confidence);
   };
+
 
   // =====================================================
   // FORMATTERS
   // =====================================================
 
   const formatLatency = (value) => {
+
     if (
       value === undefined ||
       value === null
@@ -202,16 +272,23 @@ function App() {
       return "—";
     }
 
+
     const number = Number(value);
+
 
     if (Number.isNaN(number)) {
       return "—";
     }
 
-    return `${(number / 1000).toFixed(2)}s`;
+
+    return `${(
+      number / 1000
+    ).toFixed(2)}s`;
   };
 
+
   const formatNumber = (value) => {
+
     if (
       value === undefined ||
       value === null
@@ -219,16 +296,21 @@ function App() {
       return "—";
     }
 
+
     const number = Number(value);
+
 
     if (Number.isNaN(number)) {
       return String(value);
     }
 
+
     return number.toLocaleString();
   };
 
+
   const formatCost = (value) => {
+
     if (
       value === undefined ||
       value === null
@@ -236,16 +318,21 @@ function App() {
       return "$0.000000";
     }
 
+
     const number = Number(value);
+
 
     if (Number.isNaN(number)) {
       return "$0.000000";
     }
 
+
     return `$${number.toFixed(6)}`;
   };
 
+
   const getInputTokens = (provider) => {
+
     if (!provider) return null;
 
     return (
@@ -258,7 +345,9 @@ function App() {
     );
   };
 
+
   const getOutputTokens = (provider) => {
+
     if (!provider) return null;
 
     return (
@@ -271,8 +360,11 @@ function App() {
     );
   };
 
+
   const getTotalTokens = (provider) => {
+
     if (!provider) return null;
+
 
     if (
       provider.total_tokens !== undefined &&
@@ -281,8 +373,13 @@ function App() {
       return provider.total_tokens;
     }
 
-    const input = getInputTokens(provider);
-    const output = getOutputTokens(provider);
+
+    const input =
+      getInputTokens(provider);
+
+    const output =
+      getOutputTokens(provider);
+
 
     if (
       input === null &&
@@ -291,13 +388,16 @@ function App() {
       return null;
     }
 
+
     return (
       Number(input || 0) +
       Number(output || 0)
     );
   };
 
+
   const getLatency = (provider) => {
+
     if (!provider) return null;
 
     return (
@@ -309,11 +409,14 @@ function App() {
     );
   };
 
+
   const getCost = (provider) => {
+
     if (!provider) return null;
 
     return provider.cost ?? null;
   };
+
 
   // =====================================================
   // DATA
@@ -324,33 +427,42 @@ function App() {
   const comparison = result?.comparison;
   const confidence = getConfidence();
 
+
   // =====================================================
   // UI
   // =====================================================
 
   return (
+
     <div className={`app ${darkMode ? "dark" : ""}`}>
 
-      {/* =================================================
-          HEADER
-      ================================================= */}
+      {/* HEADER */}
 
       <header className="header">
 
         <div className="brand">
-          <h1>Hybrid AI Router</h1>
+
+          <h1>
+            Hybrid AI Router
+          </h1>
 
           <p>
             JEV + Gemini · Intelligent AI routing
           </p>
+
         </div>
+
 
         <div className="header-actions">
 
           <div className="status">
+
             <span className="dot"></span>
+
             System Online
+
           </div>
+
 
           <button
             className="theme-toggle"
@@ -359,7 +471,9 @@ function App() {
             }
             type="button"
           >
-            {darkMode ? "☀ Light" : "☾ Dark"}
+            {darkMode
+              ? "☀ Light"
+              : "☾ Dark"}
           </button>
 
         </div>
@@ -367,9 +481,7 @@ function App() {
       </header>
 
 
-      {/* =================================================
-          MAIN
-      ================================================= */}
+      {/* MAIN */}
 
       <main>
 
@@ -381,27 +493,32 @@ function App() {
             AI ROUTING ENGINE
           </div>
 
+
           <h2>
+
             Ask anything.
+
             <br />
 
             <span>
               We route it intelligently.
             </span>
+
           </h2>
 
+
           <p className="subtitle">
+
             A hybrid AI system that automatically
             chooses between JEV and Gemini based
             on the nature of your query.
+
           </p>
 
         </section>
 
 
-        {/* =================================================
-            QUERY CARD
-        ================================================= */}
+        {/* QUERY CARD */}
 
         <section className="query-card">
 
@@ -418,6 +535,7 @@ function App() {
               </p>
 
             </div>
+
 
             <span className="text-only">
               TEXT
@@ -441,6 +559,7 @@ function App() {
               {query.length} characters
             </span>
 
+
             <button
               onClick={analyzeQuery}
               disabled={
@@ -448,9 +567,11 @@ function App() {
               }
               type="button"
             >
+
               {loading
                 ? "Analyzing..."
                 : "Analyze →"}
+
             </button>
 
           </div>
@@ -458,11 +579,10 @@ function App() {
         </section>
 
 
-        {/* =================================================
-            ERROR
-        ================================================= */}
+        {/* ERROR */}
 
         {error && (
+
           <div className="error-box">
 
             <span>⚠</span>
@@ -470,12 +590,11 @@ function App() {
             {error}
 
           </div>
+
         )}
 
 
-        {/* =================================================
-            RESPONSE
-        ================================================= */}
+        {/* RESPONSE */}
 
         {result && (
 
@@ -486,9 +605,7 @@ function App() {
             </div>
 
 
-            {/* =================================================
-                ANSWER CARD
-            ================================================= */}
+            {/* ANSWER CARD */}
 
             <div className="answer-card">
 
@@ -502,6 +619,7 @@ function App() {
 
                 </div>
 
+
                 <span className="routed">
                   ROUTED
                 </span>
@@ -509,9 +627,7 @@ function App() {
               </div>
 
 
-              {/* =================================================
-                  ACTUAL ANSWER
-              ================================================= */}
+              {/* ACTUAL ANSWER */}
 
               <div className="answer-content">
 
@@ -543,13 +659,13 @@ function App() {
             </div>
 
 
-            {/* =================================================
-                EVALUATION BUTTON
-            ================================================= */}
+            {/* EVALUATION BUTTON */}
 
             <button
               className={`evaluation-button ${
-                showEvaluation ? "open" : ""
+                showEvaluation
+                  ? "open"
+                  : ""
               }`}
               onClick={() =>
                 setShowEvaluation(
@@ -564,6 +680,7 @@ function App() {
                 <div className="evaluation-icon">
                   ✦
                 </div>
+
 
                 <div>
 
@@ -582,26 +699,24 @@ function App() {
 
 
               <span className="arrow">
+
                 {showEvaluation
                   ? "↑"
                   : "↓"}
+
               </span>
 
             </button>
 
 
-            {/* =================================================
-                EVALUATION
-            ================================================= */}
+            {/* EVALUATION */}
 
             {showEvaluation && (
 
               <div className="evaluation-panel">
 
 
-                {/* =================================================
-                    ROUTING DECISION
-                ================================================= */}
+                {/* ROUTING DECISION */}
 
                 <div className="eval-block">
 
@@ -610,6 +725,7 @@ function App() {
                     <span>
                       01
                     </span>
+
 
                     <div>
 
@@ -649,13 +765,15 @@ function App() {
                       </span>
 
                       <strong>
+
                         {getProvider() === "JEV"
                           ? (
-                              result.jev?.answer?.decision ??
-                              result.decision ??
-                              "—"
-                            )
+                            result.jev?.answer?.decision ??
+                            result.decision ??
+                            "—"
+                          )
                           : "Generated response"}
+
                       </strong>
 
                     </div>
@@ -682,9 +800,7 @@ function App() {
                 </div>
 
 
-                {/* =================================================
-                    PERFORMANCE
-                ================================================= */}
+                {/* PERFORMANCE */}
 
                 <div className="eval-block">
 
@@ -693,6 +809,7 @@ function App() {
                     <span>
                       02
                     </span>
+
 
                     <div>
 
@@ -731,6 +848,7 @@ function App() {
 
                         </div>
 
+
                         <span className="used">
                           USED
                         </span>
@@ -741,6 +859,7 @@ function App() {
                       <div className="metrics">
 
                         <div>
+
                           <span>
                             Latency
                           </span>
@@ -750,10 +869,12 @@ function App() {
                               getLatency(jev)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Input Tokens
                           </span>
@@ -763,10 +884,12 @@ function App() {
                               getInputTokens(jev)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Output Tokens
                           </span>
@@ -776,10 +899,12 @@ function App() {
                               getOutputTokens(jev)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Total Tokens
                           </span>
@@ -789,10 +914,12 @@ function App() {
                               getTotalTokens(jev)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Cost
                           </span>
@@ -802,6 +929,7 @@ function App() {
                               getCost(jev)
                             )}
                           </strong>
+
                         </div>
 
                       </div>
@@ -833,6 +961,7 @@ function App() {
                       <div className="metrics">
 
                         <div>
+
                           <span>
                             Latency
                           </span>
@@ -842,10 +971,12 @@ function App() {
                               getLatency(gemini)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Input Tokens
                           </span>
@@ -855,10 +986,12 @@ function App() {
                               getInputTokens(gemini)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Output Tokens
                           </span>
@@ -868,10 +1001,12 @@ function App() {
                               getOutputTokens(gemini)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Total Tokens
                           </span>
@@ -881,10 +1016,12 @@ function App() {
                               getTotalTokens(gemini)
                             )}
                           </strong>
+
                         </div>
 
 
                         <div>
+
                           <span>
                             Cost
                           </span>
@@ -894,6 +1031,7 @@ function App() {
                               getCost(gemini)
                             )}
                           </strong>
+
                         </div>
 
                       </div>
@@ -905,9 +1043,7 @@ function App() {
                 </div>
 
 
-                {/* =================================================
-                    SUMMARY
-                ================================================= */}
+                {/* SUMMARY */}
 
                 <div className="evaluation-summary">
 
@@ -918,6 +1054,7 @@ function App() {
                     </span>
 
                     <strong>
+
                       {comparison?.time_difference_ms !==
                         undefined &&
                       comparison?.time_difference_ms !==
@@ -928,6 +1065,7 @@ function App() {
                             ) / 1000
                           ).toFixed(2)}s`
                         : "—"}
+
                     </strong>
 
                   </div>
@@ -940,12 +1078,14 @@ function App() {
                     </span>
 
                     <strong>
+
                       {comparison?.time_saved_percent !==
                         undefined &&
                       comparison?.time_saved_percent !==
                         null
                         ? `${comparison.time_saved_percent}%`
                         : "—"}
+
                     </strong>
 
                   </div>
@@ -958,11 +1098,13 @@ function App() {
                     </span>
 
                     <strong>
+
                       {comparison?.faster_provider
                         ? String(
                             comparison.faster_provider
                           ).toUpperCase()
                         : "—"}
+
                     </strong>
 
                   </div>
@@ -980,9 +1122,7 @@ function App() {
       </main>
 
 
-      {/* =================================================
-          FOOTER
-      ================================================= */}
+      {/* FOOTER */}
 
       <footer>
 
@@ -997,5 +1137,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
