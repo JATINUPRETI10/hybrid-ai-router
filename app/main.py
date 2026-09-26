@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
+from fastapi.middleware.cors import CORSMiddleware
 from app.llm import ask_llm
 from app.jev import ask_jev
 from app.router import route_query
@@ -11,12 +11,15 @@ from app.executor import (
     compare_backends
 )
 
-app = FastAPI(
-    title="Hybrid AI Router",
-    description="Intelligent routing between JEV and Gemini",
-    version="1.0.0"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://hybrid-ai-router-pink.vercel.app"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
 
 # --------------------------------------------------
 # CORS
