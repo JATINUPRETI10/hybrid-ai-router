@@ -145,11 +145,14 @@ Gemini is selected for general-purpose tasks such as:
 
 ```
 ## Example Routing Response
+```json
 {
   "query": "Determine whether this transaction is fraudulent or legitimate.",
   "route": "jev"
 }
+```
 ## Example Chat Response
+```json
 {
   "query": "What is machine learning?",
   "route": "gemini",
@@ -157,18 +160,19 @@ Gemini is selected for general-purpose tasks such as:
     "provider": "gemini"
   }
 }
+```
 # Technology Stack
 ## Frontend
-React
-JavaScript
-Vite
-CSS
+-React
+-JavaScript
+-Vite
+-CSS
 ## Backend
-Python
-FastAPI
-Pydantic
-Uvicorn
+-Python
+-FastAPI
+-Pydantic
+-Uvicorn
 ## AI
 Gemini
-JEV
-LLM-based routing
+-JEV
+-LLM-based routing
