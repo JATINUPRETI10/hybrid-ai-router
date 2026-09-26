@@ -84,6 +84,7 @@ The goal is to build a performance-aware AI routing layer that can select the ap
                     +---------------------+
                     |  Normalized Result  |
                     +---------------------+
+```
 
 ## Core Features
 
@@ -142,4 +143,32 @@ Gemini is selected for general-purpose tasks such as:
   "query": "Determine whether this transaction is fraudulent or legitimate."
 }
 
-
+```
+## Example Routing Response
+{
+  "query": "Determine whether this transaction is fraudulent or legitimate.",
+  "route": "jev"
+}
+## Example Chat Response
+{
+  "query": "What is machine learning?",
+  "route": "gemini",
+  "execution": {
+    "provider": "gemini"
+  }
+}
+# Technology Stack
+## Frontend
+React
+JavaScript
+Vite
+CSS
+## Backend
+Python
+FastAPI
+Pydantic
+Uvicorn
+## AI
+Gemini
+JEV
+LLM-based routing
