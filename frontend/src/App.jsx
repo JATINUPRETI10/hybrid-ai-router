@@ -24,7 +24,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/compare",
+        "https://hybrid-ai-router-gv4w.onrender.com/compare",
         {
           method: "POST",
           headers: {
